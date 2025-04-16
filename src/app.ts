@@ -8,7 +8,11 @@ import path from "path";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/user_routes";
 
+
 const app = express();
+import commentRoutes from "./routes/comments_routes";
+app.use("/comments", commentRoutes);
+
 
 // Middlewares
 app.use(cors());
