@@ -1,16 +1,25 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import userModel, { IUser } from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import mongoose, { Document, Types } from "mongoose";
 
-// טיפוס מורחב לבקשה עם user
-interface AuthenticatedRequest extends Request {
-  user?: string;
-}
+// טיפוס מורחב למשתמש כולל _id ו־save
+type IUserDoc = IUser &
+  Document & {
+    _id: Types.ObjectId;
+    refreshToken?: string[];
+    save: () => Promise<IUserDoc>;
+  };
 
-// יוצרת טוקנים עבור המשתמש
+// פונקציית יצירת טוקנים
 const generateToken = (userId: string) => {
-  if (!process.env.TOKEN_SECRET || !process.env.TOKEN_EXPIRES || !process.env.REFRESH_TOKEN_EXPIRES) return null;
+  if (
+    !process.env.TOKEN_SECRET ||
+    !process.env.TOKEN_EXPIRES ||
+    !process.env.REFRESH_TOKEN_EXPIRES
+  )
+    return null;
 
   const payload = { _id: userId, random: Math.random().toString() };
 
@@ -41,8 +50,8 @@ export const register = async (req: Request, res: Response) => {
     const tokens = generateToken(user._id.toString());
     if (!tokens) return res.status(500).send("Token creation failed");
 
-    user.refreshToken = [tokens.refreshToken];
-    await user.save();
+    (user as IUserDoc).refreshToken = [tokens.refreshToken];
+    await (user as IUserDoc).save();
 
     res.status(201).send({
       user: { _id: user._id, email: user.email, username: user.username },
@@ -68,8 +77,9 @@ export const login = async (req: Request, res: Response) => {
     const tokens = generateToken(user._id.toString());
     if (!tokens) return res.status(500).send("Token generation failed");
 
-    user.refreshToken = [...(user.refreshToken || []), tokens.refreshToken];
-    await user.save();
+    const u = user as IUserDoc;
+    u.refreshToken = [...(u.refreshToken || []), tokens.refreshToken];
+    await u.save();
 
     res.status(200).send({
       user: { _id: user._id, email: user.email, username: user.username },
@@ -81,22 +91,8 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// אימות טוקן
-export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token || !process.env.TOKEN_SECRET) return res.status(401).send("Access Denied");
-
-  jwt.verify(token, process.env.TOKEN_SECRET, (err, payload) => {
-    if (err) return res.status(401).send("Invalid token");
-    req.user = (payload as any)._id;
-    next();
-  });
-};
-
-// אימות רענון טוקן
-const verifyRefreshToken = (refreshToken: string): Promise<InstanceType<typeof userModel>> => {
+// בדיקת refreshToken
+const verifyRefreshToken = (refreshToken: string): Promise<IUserDoc> => {
   return new Promise(async (resolve, reject) => {
     if (!process.env.TOKEN_SECRET) return reject("Invalid token");
 
@@ -104,13 +100,14 @@ const verifyRefreshToken = (refreshToken: string): Promise<InstanceType<typeof u
       if (err) return reject("Invalid token");
 
       const user = await userModel.findById(payload._id);
-      if (!user || !user.refreshToken?.includes(refreshToken)) {
+      if (!user || !(user as IUserDoc).refreshToken?.includes(refreshToken)) {
         return reject("Invalid token");
       }
 
-      user.refreshToken = user.refreshToken.filter((t) => t !== refreshToken);
-      await user.save();
-      resolve(user);
+      const u = user as IUserDoc;
+      u.refreshToken = u.refreshToken?.filter((t) => t !== refreshToken);
+      await u.save();
+      resolve(u);
     });
   });
 };
@@ -144,3 +141,19 @@ export const logout = async (req: Request, res: Response) => {
     res.status(400).send("Logout failed");
   }
 };
+// Middleware לאימות טוקן
+export const authMiddleware = (req: Request, res: Response, next: Function) => {
+    const authHeader = req.header("authorization");
+    const token = authHeader && authHeader.split(" ")[1];
+  
+    if (!token || !process.env.TOKEN_SECRET) {
+      return res.status(401).send("Access Denied");
+    }
+  
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, payload) => {
+      if (err) return res.status(401).send("Invalid token");
+      (req as any).user = (payload as any)._id; // נכניס את ה־user ל־req
+      next();
+    });
+  };
+  
