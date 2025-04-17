@@ -16,12 +16,31 @@ import upload from "../middleware/multer_upload";
  * @swagger
  * /api/posts:
  *   get:
- *     summary: Get all posts
+ *     summary: Get all posts with pagination
  *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Current page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of posts per page
+ *       - in: query
+ *         name: owner
+ *         schema:
+ *           type: string
+ *         description: Filter posts by owner ID
  *     responses:
  *       200:
- *         description: List of posts
+ *         description: A paginated list of posts
  */
+
 router.get("/", postsController.getAll.bind(postsController));
 
 /**
