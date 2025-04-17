@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import postModel, { IPost } from "../models/post_model";
 import BaseController from "./base_controller";
 
+
 // טיפוס מותאם עבור בקשות עם req.user
 interface AuthenticatedRequest extends Request {
   user?: string;
@@ -12,22 +13,26 @@ class PostsController extends BaseController<IPost> {
     super(postModel);
   }
 
-  // יצירת פוסט חדש
-  async create(req: Request, res: Response) {
+ // יצירת פוסט חדש עם תמונה
+async create(req: Request, res: Response): Promise<void> {
     try {
-      const { title, content, owner, image } = req.body;
-
+      const { title, content, owner } = req.body;
+  
+      // התמונה מגיעה מה-upload, לא מה-body
+      const image = req.file ? `/uploads/${req.file.filename}` : "";
+  
       if (!title || !content || !owner) {
         res.status(400).json({ message: "Missing required fields" });
         return;
-              }
-
+      }
+  
       const post = await postModel.create({ title, content, owner, image });
       res.status(201).json(post);
     } catch (error) {
       res.status(500).json({ message: "Failed to create post." });
     }
   }
+  
 
   // סימון לייק / ביטול לייק
   async likePost(req: AuthenticatedRequest, res: Response): Promise<void> {
