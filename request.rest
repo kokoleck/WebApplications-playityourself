@@ -1,28 +1,74 @@
-###
-
-GET http://localhost:3000/posts
-
-###
-
-GET http://localhost:3000/posts?owner=eden2
+### ברוכים הבאים
+GET http://localhost:3000/
 
 ###
-GET http://localhost:3000/posts/673c96220058b8ea0d460f42
+### 🧑‍💻 USERS
 
+GET http://localhost:3000/api/users/662f6dcce96214d06dcaa123
 
 ###
-POST http://localhost:3000/posts 
+PUT http://localhost:3000/api/users/662f6dcce96214d06dcaa123
 Content-Type: application/json
 
 {
-    "owner": "korin",
-    "title": "my first post",
-    "content": "this is my first post"
+  "username": "NewUsername",
+  "profileImage": "http://example.com/image.jpg"
 }
 
+###
+### 📝 POSTS
+
+GET http://localhost:3000/api/posts
 
 ###
-DELETE http://localhost:3000/posts/84578544
+GET http://localhost:3000/api/posts/662f6f11e96214d06dcaa456
 
+###
+POST http://localhost:3000/api/posts
+Content-Type: application/json
 
+{
+  "title": "First Post",
+  "content": "This is the content of the post",
+  "owner": "662f6dcce96214d06dcaa123",
+  "image": "http://example.com/image.jpg"
+}
 
+###
+PUT http://localhost:3000/api/posts/662f6f11e96214d06dcaa456
+Content-Type: application/json
+
+{
+  "title": "Updated title",
+  "content": "Updated content"
+}
+
+###
+PUT http://localhost:3000/api/posts/662f6f11e96214d06dcaa456/like
+
+###
+DELETE http://localhost:3000/api/posts/662f6f11e96214d06dcaa456
+
+###
+### 💬 COMMENTS
+
+GET http://localhost:3000/api/comments
+
+###
+GET http://localhost:3000/api/comments/662f7001e96214d06dcaa789
+
+###
+GET http://localhost:3000/api/comments/post/662f6f11e96214d06dcaa456
+
+###
+POST http://localhost:3000/api/comments
+Content-Type: application/json
+
+{
+  "comment": "Great post!",
+  "postId": "662f6f11e96214d06dcaa456",
+  "owner": "662f6dcce96214d06dcaa123"
+}
+
+###
+DELETE http://localhost:3000/api/comments/662f7001e96214d06dcaa789
