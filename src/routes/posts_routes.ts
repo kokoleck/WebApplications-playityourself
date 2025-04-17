@@ -2,31 +2,166 @@ import express from "express";
 const router = express.Router();
 
 import postsController from "../controllers/post_controller";
-import { authMiddleware } from "../middleware/auth"; //
+import { authMiddleware } from "../middleware/auth";
 import upload from "../middleware/multer_upload";
 
 /**
- * Routes for managing posts
+ * @swagger
+ * tags:
+ *   name: Posts
+ *   description: The Posts API
  */
 
-// שליפת כל הפוסטים
+/**
+ * @swagger
+ * /api/posts:
+ *   get:
+ *     summary: Get all posts
+ *     tags: [Posts]
+ *     responses:
+ *       200:
+ *         description: List of posts
+ */
 router.get("/", postsController.getAll.bind(postsController));
 
-// שליפת פוסט לפי ID
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   get:
+ *     summary: Get a post by ID
+ *     tags: [Posts]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: Post ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The requested post
+ *       404:
+ *         description: Post not found
+ */
 router.get("/:id", postsController.getById.bind(postsController));
 
-// יצירת פוסט חדש
+/**
+ * @swagger
+ * /api/posts:
+ *   post:
+ *     summary: Create a new post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               owner:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Post created successfully
+ *       400:
+ *         description: Missing required fields
+ */
 router.post("/", authMiddleware, upload.single("image"), postsController.create.bind(postsController));
 
-// עדכון פוסט
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   put:
+ *     summary: Update a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: Post ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Post updated successfully
+ *       401:
+ *         description: Not authorized
+ *       404:
+ *         description: Post not found
+ */
 router.put("/:id", authMiddleware, upload.single("image"), postsController.update.bind(postsController));
 
-// לייק / הסרת לייק
+/**
+ * @swagger
+ * /api/posts/{id}/like:
+ *   put:
+ *     summary: Like or unlike a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post ID
+ *     responses:
+ *       200:
+ *         description: Like toggled successfully
+ *       404:
+ *         description: Post not found
+ */
 router.put("/:id/like", authMiddleware, (req, res, next) => {
   postsController.likePost(req, res).catch(next);
 });
 
-// מחיקת פוסט (אם תוסיפי בהמשך deleteItem)
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   delete:
+ *     summary: Delete a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post ID
+ *     responses:
+ *       200:
+ *         description: Post deleted successfully
+ *       404:
+ *         description: Post not found
+ */
 router.delete("/:id", authMiddleware, postsController.deleteItem?.bind(postsController));
 
 export default router;
