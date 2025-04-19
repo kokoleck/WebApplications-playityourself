@@ -15,7 +15,12 @@ import commentRoutes from "./routes/comments_routes";
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+    cors({
+      origin: "http://localhost:3000", // כתובת הפרונט שלך
+      credentials: true, // אם תשתמשי ב-cookies בעתיד
+    })
+  );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
