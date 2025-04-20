@@ -1,40 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 export default function SignIn() {
   const [showRegister, setShowRegister] = useState(false);
-
-  // סטייט התחברות
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  // סטייט הרשמה
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-
   const navigate = useNavigate();
 
-  // פונקציית התחברות
+  // ✅ התחברות אוטומטית אחרי redirect מ-Google עם token
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
+      alert("התחברת בהצלחה דרך Google!");
+      navigate("/");
+    }
+  }, []);
+
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/users/login", {
+      const res = await fetch("http://localhost:3000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: loginEmail,
-          password: loginPassword,
-        }),
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
 
       const data = await res.json();
-
       if (res.ok) {
         alert("התחברת בהצלחה!");
         localStorage.setItem("token", data.accessToken);
-
-        // נבצע ניווט לדף הבית
         navigate("/");
       } else {
         alert(data.message || "שגיאת התחברות");
@@ -45,10 +44,9 @@ export default function SignIn() {
     }
   };
 
-  // פונקציית הרשמה
   const handleRegister = async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/users/register", {
+      const res = await fetch("http://localhost:3000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -59,7 +57,6 @@ export default function SignIn() {
       });
 
       const data = await res.json();
-
       if (res.ok) {
         alert("נרשמת בהצלחה!");
         setShowRegister(false);
@@ -75,6 +72,10 @@ export default function SignIn() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.open("http://localhost:3001/api/auth/google", "_self");
+};
+
   return (
     <div className="loginContainer">
       <div className="loginCard">
@@ -83,7 +84,6 @@ export default function SignIn() {
         </h1>
         <p className="loginSubtitle">Made by you. Played by all.</p>
 
-        {/* טופס התחברות */}
         <input
           type="email"
           placeholder="Email"
@@ -98,12 +98,11 @@ export default function SignIn() {
           value={loginPassword}
           onChange={(e) => setLoginPassword(e.target.value)}
         />
-
         <button className="loginButton" onClick={handleLogin}>
           Log in
         </button>
 
-        <button className="loginButton google">
+        <button className="loginButton google" onClick={handleGoogleLogin}>
           <img src="/GoogleIcon.jpg" alt="google" className="googleIcon" />
           Log in with Google
         </button>
@@ -116,7 +115,6 @@ export default function SignIn() {
         </p>
       </div>
 
-      {/* מודאל הרשמה */}
       {showRegister && (
         <div className="modalOverlay">
           <div className="registerModal">
@@ -124,7 +122,6 @@ export default function SignIn() {
               ✕
             </button>
             <h2 className="text-xl font-bold text-center">Sign up</h2>
-
             <input
               type="text"
               placeholder="User name"
@@ -146,7 +143,6 @@ export default function SignIn() {
               value={registerPassword}
               onChange={(e) => setRegisterPassword(e.target.value)}
             />
-
             <button className="loginButton" onClick={handleRegister}>
               Sign up
             </button>

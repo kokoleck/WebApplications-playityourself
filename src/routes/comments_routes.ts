@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 import commentsController from "../controllers/comments_controller";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware } from "../controllers/auth_controller";
 
 /**
  * @swagger
@@ -12,53 +12,58 @@ import { authMiddleware } from "../middleware/auth";
 
 /**
  * @swagger
- * /api/comments:
+ * components:
+ *   schemas:
+ *     Comment:
+ *       type: object
+ *       required:
+ *         - comment
+ *         - postId
+ *         - owner
+ *       properties:
+ *         _id:
+ *           type: string
+ *         comment:
+ *           type: string
+ *         postId:
+ *           type: string
+ *         owner:
+ *           type: string
+ *       example:
+ *         _id: 624bc3a7e9cf1c0015f24a9a
+ *         comment: This game is awesome!
+ *         postId: 623eefa6c6b1a700151c1eaa
+ *         owner: 623edbea09b1e000155d77a0
+ */
+
+/**
+ * @swagger
+ * /comments:
  *   get:
  *     summary: Get all comments
  *     tags: [Comments]
  *     responses:
  *       200:
- *         description: List of all comments
+ *         description: A list of all comments
  */
 router.get("/", commentsController.getAll.bind(commentsController));
 
 /**
  * @swagger
- * /api/comments/post/{postId}:
+ * /comments/{id}:
  *   get:
- *     summary: Get all comments for a specific post
+ *     summary: Get comment by ID
  *     tags: [Comments]
  *     parameters:
- *       - name: postId
- *         in: path
+ *       - in: path
+ *         name: id
  *         required: true
- *         description: ID of the post
  *         schema:
  *           type: string
- *     responses:
- *       200:
- *         description: List of comments for the post
- *       404:
- *         description: Comments not found
- */
-router.get("/post/:postId", commentsController.getByPostId.bind(commentsController));
-
-/**
- * @swagger
- * /api/comments/{id}:
- *   get:
- *     summary: Get a comment by ID
- *     tags: [Comments]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
  *         description: Comment ID
- *         schema:
- *           type: string
  *     responses:
  *       200:
- *         description: The requested comment
+ *         description: Comment fetched successfully
  *       404:
  *         description: Comment not found
  */
@@ -66,7 +71,7 @@ router.get("/:id", commentsController.getById.bind(commentsController));
 
 /**
  * @swagger
- * /api/comments:
+ * /comments:
  *   post:
  *     summary: Create a new comment
  *     tags: [Comments]
@@ -77,21 +82,10 @@ router.get("/:id", commentsController.getById.bind(commentsController));
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - comment
- *               - postId
- *               - owner
- *             properties:
- *               comment:
- *                 type: string
- *               postId:
- *                 type: string
- *               owner:
- *                 type: string
+ *             $ref: '#/components/schemas/Comment'
  *     responses:
  *       201:
- *         description: Comment created successfully
+ *         description: Comment created
  *       400:
  *         description: Invalid input
  */
@@ -99,22 +93,22 @@ router.post("/", authMiddleware, commentsController.create.bind(commentsControll
 
 /**
  * @swagger
- * /api/comments/{id}:
+ * /comments/{id}:
  *   delete:
  *     summary: Delete a comment
  *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: id
- *         in: path
+ *       - in: path
+ *         name: id
  *         required: true
- *         description: Comment ID
  *         schema:
  *           type: string
+ *         description: Comment ID
  *     responses:
  *       200:
- *         description: Comment deleted successfully
+ *         description: Comment deleted
  *       404:
  *         description: Comment not found
  */
