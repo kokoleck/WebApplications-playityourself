@@ -166,6 +166,8 @@ router.get("/:id", postsController.getById.bind(postsController));
  */
 router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
 
-router.post("/", authMiddleware, upload.single("image"), postsController.create.bind(postsController));
+router.post("/", authMiddleware, postsController.create.bind(postsController));
+
+router.patch("/:id", authMiddleware, postsController.likePost.bind(postsController));
 
 export default router;

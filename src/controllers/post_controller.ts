@@ -31,7 +31,7 @@ class PostsController extends BaseController<IPost> {
       const totalPages = Math.ceil(total / limitNum);
 
       res.status(200).json({
-        data: posts,
+        posts: posts,
         currentPage: pageNum,
         totalPages,
         totalCount: total,
@@ -50,9 +50,12 @@ class PostsController extends BaseController<IPost> {
     // נשתמש ב-type assertion כדי להכריח את TypeScript להבין שיש req.user
     const userId = (req as any).user?._id;
 
-    const image = req.file
-      ? `http://localhost:3000/uploads/${req.file.filename}`
-      : undefined;
+    //const image = req.file
+    //  ? `http://localhost:3000/uploads/${req.file.filename}`//אופציה אחרת לשמירת התמונות לא כURL
+     // : undefined;//
+
+     const image = req.body.image || "";
+
 
     if (!title || !content || !userId) {
       res.status(400).json({ message: "Missing required fields." });
@@ -67,7 +70,7 @@ console.log("user id", res.locals.userIdS)
       userId: res.locals.userId
     });
 
-    res.status(201).json({ post });
+    res.status(201).json( post );
   } catch (error) {
     if (error instanceof mongoose.Error.ValidationError) {
       res.status(400).json({ message: error.message });
@@ -79,10 +82,10 @@ console.log("user id", res.locals.userIdS)
 }
 
   // סימון לייק / ביטול לייק
-  async likePost(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async likePost(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.id;
-      const userId = req.user;
+      const userId = (req as AuthenticatedRequest).user;
 
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
@@ -130,7 +133,9 @@ console.log("user id", res.locals.userIdS)
       }
 
       const { title, content } = req.body;
-      const image = req.file ? `/uploads/${req.file.filename}` : post.image;
+      //const image = req.file ? `/uploads/${req.file.filename}` : post.image;//
+      const image = req.body.image || "";
+
 
       const updatedPost = await postModel.findByIdAndUpdate(
         postId,
