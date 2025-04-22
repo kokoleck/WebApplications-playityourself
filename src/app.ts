@@ -11,8 +11,12 @@ import mongoose from "mongoose";
 import userRoutes from "./routes/user_routes";
 import postRoutes from "./routes/posts_routes";
 import commentRoutes from "./routes/comments_routes";
+import googleRoutes from "./routes/google_routes"; // Import googleRoutes
+import filesRoutes from "./routes/file_routes"; // Import filesRoutes
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Middleware
 app.use(
@@ -31,6 +35,9 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+  app.use("/api/auth", googleRoutes);
+  app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+  app.use("/api/files", filesRoutes);
 
 // Default Route
 app.get("/", (req, res) => {

@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest --detectOpenHandles --forceExit --runInBand",
+    "testfile": " tsc && jest --detectOpenHandles --forceExit file.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "Korin Yoffe",

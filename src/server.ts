@@ -21,8 +21,6 @@ initApp().then((app) => {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Google routes
-  app.use("/api/auth", googleRoutes);
 
   setupSwagger(app);
 

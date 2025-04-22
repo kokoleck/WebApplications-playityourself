@@ -1,40 +1,46 @@
-// src/middleware/multer_config.ts
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+import multer from 'multer';
+import path from 'path';
+import express from 'express';
+
+// הגדרת תיקיית ה-upload
+const uploadPath = path.join(__dirname, '../../uploads');
 
 // לוודא שהתיקייה קיימת
-const uploadDir = path.join(__dirname, "../../uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+import fs from 'fs';
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+// הגדרת אכסון הקבצים
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
+  destination: (req, file, cb) => {
+    console.log(`Multer: Setting destination to ${uploadPath}`);
+    cb(null, uploadPath);  // שמירה בתיקיית uploads
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+    console.log(`Multer: Generating filename ${filename}`);
+    cb(null, filename);  // שם ייחודי לקובץ
+  }
 });
 
-const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  // רק תמונות
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
+// סינון קבצים לקבלת רק תמונות
+const fileFilter = (req: any, file: any, cb: any) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true); // רק תמונות
   } else {
-    cb(new Error("Only image files are allowed!"));
+    cb(new Error('Not an image!'), false);
   }
 };
 
-const upload = multer({
-  storage,
-  fileFilter,
+// הגדרת upload
+export const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // עד 5MB
-  },
+    fileSize: 10 * 1024 * 1024 // מגבלת גודל של 10MB
+  }
 });
 
-export default upload;
+console.log("Multer configuration loaded.");

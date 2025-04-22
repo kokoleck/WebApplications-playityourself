@@ -16,7 +16,7 @@ export default function SignIn() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     if (token) {
-      localStorage.setItem("token", token);
+      localStorage.setItem("authToken", token);
       alert("התחברת בהצלחה דרך Google!");
       navigate("/");
     }
@@ -33,7 +33,7 @@ export default function SignIn() {
       const data = await res.json();
       if (res.ok) {
         alert("התחברת בהצלחה!");
-        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("authToken", data.accessToken);
         navigate("/");
       } else {
         alert(data.message || "שגיאת התחברות");

@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+
+
 import userModel, { IUser } from "../models/user_model";
 import bcrypt from "bcrypt";
 import mongoose, { Document, Types } from "mongoose";
@@ -150,23 +152,47 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 // ✅ Middleware לאימות טוקן
-export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const authHeader = req.header("authorization");
-  const token = authHeader && authHeader.split(" ")[1];
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  console.log("started authentication");
+  const authorization = req.header('authorization');
+  const token = authorization && authorization.split(' ')[1];
 
-  const secret = process.env.TOKEN_SECRET;
-  if (!token || !secret) {
-    res.status(401).send("Access Denied");
-    return;
+  console.log("Token received:", token);
+
+  if (!token) {
+      console.log("Token not provided");
+      res.status(401).send('Access Denied');
+      return;
   }
 
-  jwt.verify(token, secret, (err, payload) => {
-    if (err) {
-      res.status(401).send("Invalid token");
+  if (!process.env.TOKEN_SECRET) {
+      console.error("TOKEN_SECRET is not defined");
+      res.status(500).send('Server Error');
       return;
-    }
+  }
 
-    (req as any).user = (payload as any)._id;
-    next();
+  interface Payload {
+      _id: string;
+      random: string;
+      username?: string; // Added username property as optional
+  }
+  
+  jwt.verify(token, process.env.TOKEN_SECRET, (err, payload) => {
+      if (err) {
+          console.log("Token verification failed:", err);
+          res.status(401).send('Access Denied');
+          return;
+      }
+  
+      console.log("Token payload:", payload);
+      res.locals.userId = (payload as Payload)._id
+      req.user = { 
+          _id: (payload as Payload)._id, 
+          username: (payload as Payload).username || "unknown"
+      };  
+      console.log("✅ req.user:", req.user);
+
+      next();
   });
 };
+

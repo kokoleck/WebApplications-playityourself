@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 
+// הגדרת Interface לפוסט
 export interface IPost {
   title: string;
   content: string;
-  owner: string;
+  owner: string; // שם המשתמש שיצר את הפוסט
   image?: string;
   likesCount?: number;
-  likedBy?: string[];
+  likedBy?: string[]; // רשימת משתמשים שעשו לייק לפוסט
+  userId: mongoose.Schema.Types.ObjectId; // מזהה המשתמש במונגו
 }
 
 const postSchema = new mongoose.Schema<IPost>(
@@ -35,10 +37,16 @@ const postSchema = new mongoose.Schema<IPost>(
       type: [String],
       default: [],
     },
+    userId: { // מזהה המשתמש במונגו
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // מקשר את הפוסט למודל משתמש במונגו
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true } // תיעוד תאריך יצירה ועדכון של הפוסט
 );
 
+// יצירת המודל
 const postModel = mongoose.model<IPost>("Posts", postSchema);
 
 export default postModel;

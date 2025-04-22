@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import postModel, { IPost } from "../models/post_model";
 import BaseController from "./base_controller";
+import mongoose from "mongoose";
 
 // טיפוס מותאם עבור בקשות עם req.user
 interface AuthenticatedRequest extends Request {
-  user?: string;
+  user?: { _id: string };
 }
 
 class PostsController extends BaseController<IPost> {
@@ -41,24 +42,41 @@ class PostsController extends BaseController<IPost> {
   }
 
   // יצירת פוסט חדש עם תמונה
-  async create(req: Request, res: Response): Promise<void> {
-    try {
-      const { title, content, owner } = req.body;
+ // יצירת פוסט חדש עם תמונה
+ async create(req: Request, res: Response): Promise<void> {
+  try {
+    const { title, content } = req.body;
 
-      // התמונה מגיעה מה-upload, לא מה-body
-      const image = req.file ? `/uploads/${req.file.filename}` : "";
+    // נשתמש ב-type assertion כדי להכריח את TypeScript להבין שיש req.user
+    const userId = (req as any).user?._id;
 
-      if (!title || !content || !owner) {
-        res.status(400).json({ message: "Missing required fields" });
-        return;
-      }
+    const image = req.file
+      ? `http://localhost:3000/uploads/${req.file.filename}`
+      : undefined;
 
-      const post = await postModel.create({ title, content, owner, image });
-      res.status(201).json(post);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to create post." });
+    if (!title || !content || !userId) {
+      res.status(400).json({ message: "Missing required fields." });
+      return;
     }
+console.log("user id", res.locals.userIdS)
+    const post = await postModel.create({
+      title,
+      content,
+      owner: res.locals.userId,
+      image,
+      userId: res.locals.userId
+    });
+
+    res.status(201).json({ post });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      res.status(400).json({ message: error.message });
+      return;
+    }
+    console.error("Error creating post:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
+}
 
   // סימון לייק / ביטול לייק
   async likePost(req: AuthenticatedRequest, res: Response): Promise<void> {
@@ -77,13 +95,13 @@ class PostsController extends BaseController<IPost> {
         return;
       }
 
-      const alreadyLiked = post.likedBy?.includes(userId);
+      const alreadyLiked = post.likedBy?.includes(userId._id);
 
       if (alreadyLiked) {
-        post.likedBy = post.likedBy?.filter((id) => id !== userId);
+        post.likedBy = post.likedBy?.filter((id) => id !== userId._id);
         post.likesCount = Math.max(0, (post.likesCount || 0) - 1);
       } else {
-        post.likedBy = [...(post.likedBy || []), userId];
+        post.likedBy = [...(post.likedBy || []), userId._id];
         post.likesCount = (post.likesCount || 0) + 1;
       }
 
@@ -106,7 +124,7 @@ class PostsController extends BaseController<IPost> {
         return;
       }
 
-      if (post.owner.toString() !== userId) {
+      if (post.owner.toString() !== userId?._id) {
         res.status(401).json({ message: "Not authorized" });
         return;
       }

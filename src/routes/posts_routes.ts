@@ -1,15 +1,17 @@
-import express from "express";
-const router = express.Router();
-import postsController from "../controllers/post_controller";
-import { authMiddleware } from "../controllers/auth_controller";
+import { Router } from 'express';  // מוודאים שזה נכון
+import postsController from '../controllers/post_controller';  // מוודאים שזה נכון
+import { authMiddleware } from '../controllers/auth_controller';
+import { upload } from '../middleware/multer_upload';
+
+const router = Router();
 
 
 /**
-* @swagger
-* tags:
-*   name: Posts
-*   description: The Posts API
-*/
+ * @swagger
+ * tags:
+ *   name: Posts
+ *   description: The Posts API
+ */
 
 /**
  * @swagger
@@ -33,11 +35,15 @@ import { authMiddleware } from "../controllers/auth_controller";
  *         owner:
  *           type: string
  *           description: The owner id of the post
+ *         userId:
+ *           type: string
+ *           description: The ID of the user who created the post
  *       example:
  *         _id: 245234t234234r234r23f4
  *         title: My First Post
  *         content: This is the content of my first post.
- *         author: 324vt23r4tr234t245tbv45by
+ *         owner: 324vt23r4tr234t245tbv45by
+ *         userId: 60f5a8b4e31f5b3f0f77d75e
  */
 
 /**
@@ -91,7 +97,6 @@ router.get("/", postsController.getAll.bind(postsController));
  */
 router.get("/:id", postsController.getById.bind(postsController));
 
-
 /**
  * @swagger
  * /posts:
@@ -115,6 +120,9 @@ router.get("/:id", postsController.getById.bind(postsController));
  *               content:
  *                 type: string
  *                 description: The content of the post
+ *               image:
+ *                 type: string
+ *                 description: The URL of the image associated with the post
  *             required:
  *               - title
  *               - content
@@ -130,12 +138,10 @@ router.get("/:id", postsController.getById.bind(postsController));
  *       500:
  *         description: Server error
  */
-router.post("/", authMiddleware, postsController.create.bind(postsController));
-
 
 /**
  * @swagger
- * posts/{id}:
+ * /posts/{id}:
  *   delete:
  *     summary: Delete a post by ID
  *     description: Delete a single post by its ID
@@ -159,5 +165,7 @@ router.post("/", authMiddleware, postsController.create.bind(postsController));
  *         description: Server error
  */
 router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
+
+router.post("/", authMiddleware, upload.single("image"), postsController.create.bind(postsController));
 
 export default router;
