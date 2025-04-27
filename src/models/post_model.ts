@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 // הגדרת Interface לפוסט
 export interface IPost {
   title: string;
   content: string;
-  owner: string; // שם המשתמש שיצר את הפוסט
+  owner: mongoose.Types.ObjectId; // שם המשתמש שיצר את הפוסט
   image?: string;
   likesCount?: number;
   likedBy?: string[]; // רשימת משתמשים שעשו לייק לפוסט
@@ -22,7 +22,8 @@ const postSchema = new mongoose.Schema<IPost>(
       required: true,
     },
     owner: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
       required: true,
     },
     image: {

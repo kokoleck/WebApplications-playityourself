@@ -14,6 +14,11 @@
     likesCount: number;
     likedBy: string[];
     commentsList: Array<{ comment: string; username: string }>;
+    owner: {
+      username: string;
+      profileImage: string;
+      _id: string;
+    };
   }
 
   interface LikeResponse {
@@ -179,10 +184,17 @@
 </div>
     
 
+
         {Array.isArray(posts) &&
           posts.map((post) => (
             <div key={post._id} className="postCard">
-              <div className="postUsername">{post.username}</div>
+
+<div className="postUsernameWithImage">
+  <img src={post.owner.profileImage} alt="User" className="postUserProfileImage" />
+  <span className="postUsername">{post.owner.username}</span>
+</div>
+
+              
               <div className="postTitle">{post.title}</div>
               <p>{post.content}</p>
               {post.image && (

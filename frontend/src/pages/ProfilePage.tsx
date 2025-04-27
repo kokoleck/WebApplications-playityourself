@@ -1,16 +1,21 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./ProfilePage.css";
 
+
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
   const [editUsername, setEditUsername] = useState("");
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+  
 
   const loggedInUserId = localStorage.getItem("userId");
+
+  
 
   // שליפת פרטי משתמש
   useEffect(() => {
@@ -30,6 +35,9 @@ export default function ProfilePage() {
     }
   }, [id]);
 
+
+
+  
   // שליפת פוסטים של המשתמש
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -76,6 +84,29 @@ export default function ProfilePage() {
     }
   };
 
+  // טיפול במחיקת פוסט
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const authToken = localStorage.getItem("authToken");
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+  
+
+      if (response.ok) {
+        setUserPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+        alert("הפוסט נמחק בהצלחה!");
+      } else {
+        alert("נכשל במחיקת הפוסט");
+      }
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+    }
+  };
+
   return (
     <div className="profileWrapper">
       <div className="profileHeader">
@@ -92,6 +123,11 @@ export default function ProfilePage() {
           ערוך פרופיל
         </button>
       )}
+
+<button onClick={() => navigate("/")} className="backHomeButton">
+  חזרה לדף הבית
+</button>
+
 
       {/* טופס עריכה */}
       {editing && (
@@ -111,27 +147,26 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* פוסטים של המשתמש */}
-      <div className="profilePosts">
-        <h3 className="profilePostsTitle">My Posts</h3>
-        {userPosts.length === 0 ? (
-          <p>אין פוסטים להצגה.</p>
-        ) : (
-          userPosts.map((post) => (
-            <div key={post._id} className="profilePostItem">
-              <h4 className="profilePostTitle">{post.title}</h4>
-              <p>{post.content}</p>
-              {post.image && (
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="profilePostImage"
-                />
-              )}
-            </div>
-          ))
-        )}
-      </div>
+{userPosts.length === 0 ? (
+  <p>אין פוסטים להצגה.</p>
+) : (
+  userPosts.map((post) => (
+    <div key={post._id} className="profilePostItem">
+      <h4 className="profilePostTitle">{post.title}</h4>
+      <p>{post.content}</p>
+      {post.image && (
+        <img
+          src={post.image}
+          alt={post.title}
+          className="profilePostImage"
+        />
+      )}
+      <button onClick={() => handleDeletePost(post._id)} className="deletePostButton">
+        🗑️ Delete
+      </button> {/* אפשרות למחוק פוסט */}
     </div>
+  ))
+)}
+      </div>
   );
 }

@@ -8,8 +8,11 @@ import postsModel from "../models/post_model";
 export const getPostsByUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const posts = await postsModel.find({ owner: userId }).sort({ createdAt: -1 });
-    res.status(200).send(posts);
+    const posts = await postsModel
+    .find()
+    .populate('owner', 'username profileImage')  //   מוסיף טעינה של שם ותמונה של פוסט שמישהו העלה
+    .sort({ createdAt: -1 });
+      res.status(200).send(posts);
   } catch (error) {
     console.error(error);
     res.status(400).send("Failed to fetch posts by user");
@@ -41,7 +44,13 @@ class PostsController extends BaseController<IPost> {
 
       const filter = owner ? { owner } : {};
       const [posts, total] = await Promise.all([
-        this.model.find(filter).skip(skip).limit(limitNum).sort({ createdAt: -1 }),
+        this.model
+  .find(filter)
+  .populate('owner', 'username profileImage') // 🛠️ זה מה שחסר לך כאן
+  .skip(skip)
+  .limit(limitNum)
+  .sort({ createdAt: -1 })
+,
         this.model.countDocuments(filter),
       ]);
 
@@ -166,5 +175,23 @@ console.log("user id", res.locals.userIdS)
     }
   }
 }
+
+
+export const deletePost = async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.id;
+
+    const deletedPost = await postModel.findByIdAndDelete(postId);
+
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ message: "Failed to delete post" });
+  }
+};
 
 export default new PostsController();
