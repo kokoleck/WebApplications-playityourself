@@ -2,6 +2,21 @@ import { Request, Response } from "express";
 import postModel, { IPost } from "../models/post_model";
 import BaseController from "./base_controller";
 import mongoose from "mongoose";
+import postsModel from "../models/post_model"; 
+
+
+export const getPostsByUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const posts = await postsModel.find({ owner: userId }).sort({ createdAt: -1 });
+    res.status(200).send(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Failed to fetch posts by user");
+  }
+};
+
+
 
 // טיפוס מותאם עבור בקשות עם req.user
 interface AuthenticatedRequest extends Request {
@@ -13,6 +28,8 @@ class PostsController extends BaseController<IPost> {
     super(postModel);
   }
 
+
+  
   // ✅ Pagination - שליפת כל הפוסטים עם תמיכה ב-page ו-limit
   async getAll(req: Request, res: Response): Promise<void> {
     try {

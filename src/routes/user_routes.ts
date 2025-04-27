@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { getUserProfile, updateUserProfile } from "../controllers/user_controller";
 import { register, login, refresh, logout } from "../controllers/auth_controller";
+import { upload } from "../middleware/multer_upload";
 
 
 /**
@@ -23,7 +24,8 @@ const asyncHandler = (
   router.post("/login", asyncHandler(login));
   router.post("/refresh", asyncHandler(refresh));
   router.post("/logout", asyncHandler(logout));
-  
+  router.put("/:id", upload.single('profileImage'), asyncHandler(updateUserProfile)); // נתיב עדכון פרופיל משתמש
+
 
 
 /**

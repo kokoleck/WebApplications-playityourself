@@ -2,9 +2,17 @@ import { Router } from 'express';  // מוודאים שזה נכון
 import postsController from '../controllers/post_controller';  // מוודאים שזה נכון
 import { authMiddleware } from '../controllers/auth_controller';
 import { upload } from '../middleware/multer_upload';
+import express, { Request, Response, NextFunction } from "express";
+import { getPostsByUser } from "../controllers/post_controller"; 
 
-const router = Router();
+const router = express.Router();
 
+// מייבאים את הפונקציה getPostsByUser מהקונטרולר של הפוסטים
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  ) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 
 /**
  * @swagger
@@ -169,5 +177,8 @@ router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsContr
 router.post("/", authMiddleware, postsController.create.bind(postsController));
 
 router.patch("/:id", authMiddleware, postsController.likePost.bind(postsController));
+
+router.get("/user/:userId", asyncHandler(getPostsByUser));
+
 
 export default router;

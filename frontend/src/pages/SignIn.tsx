@@ -26,18 +26,30 @@ export default function SignIn() {
   }, [navigate]); // הוספנו את ה-navigate כתלות כדי לוודא שהמעבר יקרה רק אחרי ש-navigate הושלם
   
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+
   const handleLogin = async () => {
+    if (!isValidEmail(loginEmail)) {
+      alert("נא להזין כתובת אימייל תקינה");
+      return;}
     try {
       const res = await fetch("http://localhost:3000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-  
+
       const data = await res.json();
+      console.log("data:", data);
       if (res.ok) {
         toast.success("התחברת בהצלחה!"); // השתמש ב-toast.success
         localStorage.setItem("authToken", data.accessToken);
+        localStorage.setItem("userId", data.user._id);
+
         setTimeout(() => { 
           navigate("/"); // מעבר אוטומטי אחרי 2 שניות
         }, 2000);
@@ -52,6 +64,10 @@ export default function SignIn() {
   
 
   const handleRegister = async () => {
+    if (!isValidEmail(registerEmail)) {
+      alert("נא להזין כתובת אימייל תקינה");
+      return;
+    }
     try {
       const res = await fetch("http://localhost:3000/api/users/register", {
         method: "POST",

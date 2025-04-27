@@ -19,7 +19,14 @@ export const getUserProfile = async (req: Request, res: Response) => {
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
-    const { username, profileImage } = req.body;
+    const { username } = req.body;
+    let profileImage;
+
+    // אם עלתה תמונה חדשה, נשתמש בה
+    if (req.file) {
+      profileImage = `/uploads/${req.file.filename}`;
+    }
+    
 
     const updatedUser = await userModel.findByIdAndUpdate(
       userId,
@@ -33,6 +40,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 
     res.status(200).send(updatedUser);
   } catch (err) {
-    res.status(400).send(err);
+    console.error(err);
+    res.status(400).send("Failed to update user profile");
   }
 };
