@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "./MainPage.css";
 import axios from "axios";
-import { log } from "console";
 
 interface Post {
   _id: string;
@@ -10,13 +9,13 @@ interface Post {
   content: string;
   image?: string;
   likesCount: number;
-  likedBy:string[];
-  comments: number;
+  likedBy: string[];
+  commentsList: Array<{ comment: string; username: string }>;
 }
-interface LikeResponse{
+
+interface LikeResponse {
   likesCount: number;
   likedBy: string[];
-
 }
 
 export default function MainPage() {
@@ -25,16 +24,18 @@ export default function MainPage() {
   const [postContent, setPostContent] = useState("");
   const [postImage, setPostImage] = useState<File | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
+  const [commentText, setCommentText] = useState<string>("");
 
-
-  const onLike = async (postId: string) =>{
+  const onLike = async (postId: string) => {
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
       alert("User is not logged in");
       return;
     }
-    const response = await axios.patch<LikeResponse>(`http://localhost:3001/api/posts/${postId}`,
-null,
+    const response = await axios.patch<LikeResponse>(
+      `http://localhost:3001/api/posts/${postId}`,
+      null,
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -49,7 +50,7 @@ null,
         prevPosts.map((p) => (p._id === postId ? updatedPost : p))
       );
     }
-  }
+  };
 
   const handleCreatePost = async (postData: {
     owner: any;
@@ -82,19 +83,17 @@ null,
       const postToSend: {
         title: string;
         content: string;
-        image?: string | null; // Allow null if no image
+        image?: string | null;
       } = {
         title: postData.title,
         content: postData.content,
-        image: imageUrl || null, // Send the imageUrl if available, otherwise null
+        image: imageUrl || null,
       };
-
 
       console.log("Post to send:", postToSend);
 
       const response = await axios.post(
         "http://localhost:3001/api/posts",
-
         postToSend,
         {
           headers: {
@@ -106,9 +105,7 @@ null,
       console.log("Post creation response:", response.data);
 
       const newPost: Post = response.data as Post;
-    
       setPosts((prevPosts) => [newPost, ...prevPosts]);
-      // setIsModalOpen(false);//
     } catch (error: any) {
       console.error("Error creating post:", error.response?.data || error);
       alert(`Failed to create post: ${error.response?.data?.message || "Unknown error"}`);
@@ -125,10 +122,10 @@ null,
         const response = await fetch("http://localhost:3001/api/posts");
         const data = await response.json();
         console.log("Fetched posts:", data);
-        setPosts(data.posts || []); // Fallback למערך ריק במקרה של undefined
+        setPosts(data.posts || []);
       } catch (err) {
         console.error("Failed to fetch posts:", err);
-        setPosts([]); // גם כאן fallback אם יש שגיאה
+        setPosts([]);
       }
     };
 
@@ -144,7 +141,6 @@ null,
         </button>
       </div>
 
-      {/* פוסטים */}
       {Array.isArray(posts) &&
         posts.map((post) => (
           <div key={post._id} className="postCard">
@@ -155,13 +151,69 @@ null,
               <img src={post.image} alt="post" className="postImage" />
             )}
             <div className="postFooter">
-              <span onClick={() =>onLike(post._id)}>❤️ {post.likesCount}</span>
-              <span>💬 {post.comments} Comments</span>
+              <span onClick={() => onLike(post._id)}>❤️ {post.likesCount}</span>
+              <span>💬 {post.commentsList?.length || 0} Comments</span>
+              <button
+                onClick={() => {
+                  setCommentText("");
+                  setShowCommentModal(post._id);
+                }}
+              >
+                Add Comment
+              </button>
             </div>
+
+            {showCommentModal === post._id && (
+              <div className="commentModal">
+                <textarea
+                  placeholder="התגובה שלך..."
+                  rows={3}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
+                />
+                <button
+                  onClick={async () => {
+                    if (!commentText.trim()) {
+                      alert("אי אפשר לשלוח תגובה ריקה");
+                      return;
+                    }
+                    const authToken = localStorage.getItem("authToken");
+                    if (!authToken) {
+                      alert("User is not logged in");
+                      return;
+                    }
+                    try {
+                      await axios.post(
+                        "http://localhost:3001/api/comments",
+                        {
+                          postId: post._id,
+                          comment: commentText,
+                        },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${authToken}`,
+                          },
+                        }
+                      );
+                      console.log("תגובה נשלחה:", commentText);
+                      setCommentText("");
+                      setShowCommentModal(null);
+                    } catch (err: any) {
+                      console.error("Error posting comment:", err.response?.data || err);
+                      alert("שליחת התגובה נכשלה");
+                    }
+                  }}
+                  style={{ marginRight: "8px" }}
+                >
+                  שלח תגובה
+                </button>
+                <button onClick={() => setShowCommentModal(null)}>בטל</button>
+              </div>
+            )}
           </div>
         ))}
 
-      {/* מודאל */}
       {showModal && (
         <div className="modalOverlay">
           <div className="modalContent">
@@ -197,7 +249,7 @@ null,
               className="modalButton"
               onClick={() =>
                 handleCreatePost({
-                  owner: "currentUser", // Replace with actual owner data
+                  owner: "currentUser",
                   title: postTitle,
                   content: postContent,
                   image: postImage || undefined,
@@ -212,7 +264,3 @@ null,
     </div>
   );
 }
-function setIsModalOpen(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
-

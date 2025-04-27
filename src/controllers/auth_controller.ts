@@ -11,6 +11,17 @@ type tTokens = {
   refreshToken: string;
 };
 
+interface JwtPayload {
+  _id: string;
+  username?: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}
+
+
+
 // טיפוס מורחב למשתמש כולל _id ו־save
 type IUserDoc = IUser &
   Document & {

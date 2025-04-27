@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import LogoPlayItYourself from "./assets/LogoPlayItYourself.png"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SignIn() {
   const [showRegister, setShowRegister] = useState(false);
@@ -17,10 +20,11 @@ export default function SignIn() {
     const token = params.get("token");
     if (token) {
       localStorage.setItem("authToken", token);
-      alert("התחברת בהצלחה דרך Google!");
-      navigate("/");
+      // מעבר אוטומטי לדף הבית בלי רענון
+      navigate("/", { replace: true });
     }
-  }, []);
+  }, [navigate]); // הוספנו את ה-navigate כתלות כדי לוודא שהמעבר יקרה רק אחרי ש-navigate הושלם
+  
 
   const handleLogin = async () => {
     try {
@@ -29,20 +33,23 @@ export default function SignIn() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-
+  
       const data = await res.json();
       if (res.ok) {
-        alert("התחברת בהצלחה!");
+        toast.success("התחברת בהצלחה!"); // השתמש ב-toast.success
         localStorage.setItem("authToken", data.accessToken);
-        navigate("/");
+        setTimeout(() => { 
+          navigate("/"); // מעבר אוטומטי אחרי 2 שניות
+        }, 2000);
       } else {
-        alert(data.message || "שגיאת התחברות");
+        toast.error(data.message || "שגיאת התחברות"); // השתמש ב-toast.error
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert("שגיאה כללית בהתחברות");
+      toast.error("שגיאה כללית בהתחברות"); // השתמש ב-toast.error
     }
   };
+  
 
   const handleRegister = async () => {
     try {
@@ -79,8 +86,10 @@ export default function SignIn() {
   return (
     <div className="loginContainer">
       <div className="loginCard">
-        <h1 className="logoTitle">
-          PlayItYourself <span className="diceIcon">🎲</span>
+        <h1 className="logoTitle">  
+        <div className="logoContainer">
+        <img src={LogoPlayItYourself} alt="PlayItYourself " className="logoImage" />
+        </div>
         </h1>
         <p className="loginSubtitle">Made by you. Played by all.</p>
 

@@ -6,20 +6,22 @@ export interface iComment {
     owner: Schema.Types.ObjectId;
 }
 
-const commentsSchema = new mongoose.Schema<iComment>({
+const commentsSchema = new mongoose.Schema<iComment>({ //סכמת המודל של התגובות
     comment: {
         type: String,
         required: true,
     },
     postId: {
         type: Schema.Types.ObjectId,
+        ref: "posts",
         required: true,
     },
     owner: {
         type: Schema.Types.ObjectId,
+        ref: "users",
         required: true,
     },
-});
+}, { timestamps: true }); //הוספת תאריך יצירה ועדכון אוטומטית של התגובה
 
 const commentsModel = mongoose.model<iComment>("comments", commentsSchema);
 

@@ -24,6 +24,16 @@
     margin-bottom: 10px;
   }
   
+  .logoImage {
+    width: 400px; /* תוכל לשנות את הגודל הזה לפי הצורך */
+    height: auto;
+    object-fit: contain; /* שומר על יחס הגובה/רוחב */
+    margin-bottom: 30px;
+  }
+  
+  
+
+  
   .diceIcon {
     font-size: 2rem;
   }
