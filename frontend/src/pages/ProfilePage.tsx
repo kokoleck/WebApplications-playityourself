@@ -11,6 +11,11 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [editUsername, setEditUsername] = useState("");
   const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+const [editPostTitle, setEditPostTitle] = useState("");
+const [editPostContent, setEditPostContent] = useState("");
+const [editPostImage, setEditPostImage] = useState<File | null>(null);
+
   
 
   const loggedInUserId = localStorage.getItem("userId");
@@ -39,17 +44,17 @@ export default function ProfilePage() {
 
   
   // שליפת פוסטים של המשתמש
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      try {
-        const response = await fetch(`/api/posts/user/${id}`);
-        const data = await response.json();
-        setUserPosts(data);
-      } catch (error) {
-        console.error("Failed to fetch user posts:", error);
-      }
-    };
+  const fetchUserPosts = async () => {
+    try {
+      const response = await fetch(`/api/posts/user/${id}`);
+      const data = await response.json();
+      setUserPosts(data);
+    } catch (error) {
+      console.error("Failed to fetch user posts:", error);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchUserPosts();
     }
@@ -84,6 +89,63 @@ export default function ProfilePage() {
     }
   };
 
+
+  const startEditingPost = (post: any) => {
+    setEditingPostId(post._id);
+    setEditPostTitle(post.title);
+    setEditPostContent(post.content);
+    setEditPostImage(null);
+  };
+  
+  const handleUpdatePost = async (postId: string) => {
+    try {
+      const authToken = localStorage.getItem("authToken");
+      if (!authToken) {
+        alert("User is not logged in");
+        return;
+      }
+  
+      let imageUrl = "";
+  
+      if (editPostImage) {
+        const formData = new FormData();
+        formData.append("file", editPostImage);
+  
+        const imageResponse = await fetch("http://localhost:3001/api/files", {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+  
+        const imageData = await imageResponse.json();
+        imageUrl = imageData.url;
+      }
+  
+      await fetch(`/api/posts/${postId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          title: editPostTitle,
+          content: editPostContent,
+          image: imageUrl || undefined,
+        }),
+      });
+  
+      alert("הפוסט עודכן בהצלחה!");
+      setEditingPostId(null);
+      fetchUserPosts();
+    } catch (error) {
+      console.error("Failed to update post:", error);
+      alert("נכשל בעדכון הפוסט");
+    }
+  };
+
+  
   // טיפול במחיקת פוסט
   const handleDeletePost = async (postId: string) => {
     try {
@@ -164,6 +226,36 @@ export default function ProfilePage() {
       <button onClick={() => handleDeletePost(post._id)} className="deletePostButton">
         🗑️ Delete
       </button> {/* אפשרות למחוק פוסט */}
+      <button onClick={() => startEditingPost(post)} className="editPostButton">
+  ✏️ ערוך פוסט
+</button>
+
+{editingPostId === post._id && (
+  <div className="editPostForm">
+    <input
+      type="text"
+      value={editPostTitle}
+      onChange={(e) => setEditPostTitle(e.target.value)}
+      placeholder="כותרת חדשה"
+    />
+    <textarea
+      value={editPostContent}
+      onChange={(e) => setEditPostContent(e.target.value)}
+      placeholder="תוכן חדש"
+    />
+    <input
+      type="file"
+      onChange={(e) => setEditPostImage(e.target.files?.[0] || null)}
+    />
+    <button onClick={() => handleUpdatePost(post._id)} className="editPostButton">
+      שמור
+    </button>
+    <button onClick={() => setEditingPostId(null)} className="editPostButton">
+      ביטול
+    </button>
+  </div>
+)}
+
     </div>
   ))
 )}

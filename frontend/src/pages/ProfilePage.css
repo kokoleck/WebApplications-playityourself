@@ -176,3 +176,48 @@
   border-radius: 10px;
   margin-top: 10px;
 }
+
+
+.editPostForm input[type="text"],
+.editPostForm textarea,
+.editPostForm input[type="file"] {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: #f9fafb;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.editPostForm input[type="text"]:focus,
+.editPostForm textarea:focus,
+.editPostForm input[type="file"]:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+  outline: none;
+  background-color: #fff;
+}
+
+.editPostForm textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.editPostButton {
+  background-color: #ffc107;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #000;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.editPostButton:hover {
+  background-color: #e0a800;
+}
