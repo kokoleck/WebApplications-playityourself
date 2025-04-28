@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import commentsModel, { iComment } from "../models/comments_model";
 import BaseController from "./base_controller";
+import { log } from "console";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -31,14 +32,15 @@ class CommentsController extends BaseController<iComment> {
         owner: userId
       });
 
-      const populated = await newComment.populate<{ owner: { username: string } }>("owner", "username");
+      const populated = await newComment.save();
 
       res.status(201).json({
         comment: populated.comment,
-        username: populated.owner.username
+        username: populated.owner
       });
 
     } catch (err) {
+      console.log(err);
       res.status(500).json({ message: "Failed to add comment", error: err });
     }
   }
@@ -47,7 +49,7 @@ class CommentsController extends BaseController<iComment> {
   async getByPostId(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.postId;
-      const comments = await this.model.find({ postId });
+      const comments = await this.model.find({ postId }).populate('owner').sort({ createdAt: -1 });
 
       if (!comments || comments.length === 0) {
         res.status(404).json({ message: "No comments found for this post" });

@@ -9,7 +9,7 @@ export const getPostsByUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const posts = await postsModel
-    .find()
+    .find({userId: userId}) //   מחפש פוסטים לפי מזהה משתמש
     .populate('owner', 'username profileImage')  //   מוסיף טעינה של שם ותמונה של פוסט שמישהו העלה
     .sort({ createdAt: -1 });
       res.status(200).send(posts);
@@ -142,8 +142,9 @@ console.log("user id", res.locals.userIdS)
   }
 
   // עדכון פוסט (לבעל הפוסט בלבד)
-  async update(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async update(req1: Request, res: Response): Promise<void> {
     try {
+      const req = req1 as AuthenticatedRequest;
       const postId = req.params.id;
       const userId = req.user;
 

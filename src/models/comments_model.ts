@@ -18,7 +18,7 @@ const commentsSchema = new mongoose.Schema<iComment>({ //סכמת המודל ש�
     },
     owner: {
         type: Schema.Types.ObjectId,
-        ref: "users",
+        ref: "Users",
         required: true,
     },
 }, { timestamps: true }); //הוספת תאריך יצירה ועדכון אוטומטית של התגובה

@@ -13,7 +13,7 @@
     image?: string;
     likesCount: number;
     likedBy: string[];
-    commentsList: Array<{ comment: string; username: string }>;
+    commentsList: Array<{ comment: string; owner:{username: string} }>;
     owner: {
       username: string;
       profileImage: string;
@@ -27,15 +27,32 @@
   }
 
 
-  export default function MainPage() {
-    const [showModal, setShowModal] = useState(false);
-    const [postTitle, setPostTitle] = useState("");
-    const [postContent, setPostContent] = useState("");
-    const [postImage, setPostImage] = useState<File | null>(null);
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [showCommentModal, setShowCommentModal] = useState<string | null>(null);
-    const [commentText, setCommentText] = useState<string>("");
+  export default function MainPage() { // דף הבית
+    const [showModal, setShowModal] = useState(false); // דיאלוג ליצירת פוסט חדש 
+    const [postTitle, setPostTitle] = useState(""); // כותרת הפוסט
+    const [postContent, setPostContent] = useState(""); // תוכן הפוסט 
+    const [postImage, setPostImage] = useState<File | null>(null); // תמונה לפוסט
+    const [posts, setPosts] = useState<Post[]>([]); // רשימה של פוסטים
+    const [showCommentModal, setShowCommentModal] = useState<string | null>(null); // דיאלוג להוספת תגובה לפוסט
+    const [commentText, setCommentText] = useState<string>(""); // תוכן התגובה
+    const [comments, setComments] = useState<{ comment: string; owner:{username: string} }[]>([]); // רשימה של תגובות לפוסט
+const [viewCommentsPostId, setViewCommentsPostId] = useState<string | null>(null); // מזהה הפוסט שפתוח לתגובות
 
+console.log('viewCommentsPostId', viewCommentsPostId);
+
+const fetchComments = async (postId: string) => {
+  try {
+    const response = await axios.get<{  comment: string; owner:{username: string} }[] >(`http://localhost:3001/api/comments/${postId}`);
+    console.log(response.data);
+    
+    setComments(response.data);
+    setViewCommentsPostId(postId); // פותח את המודל
+  } catch (error) {
+    console.error("Failed to fetch comments:", error);
+    setComments([]);
+    alert("טעינת תגובות נכשלה");
+  }
+};
 
     const navigate = useNavigate();
 
@@ -82,7 +99,6 @@
     };
 
     const handleCreatePost = async (postData: {
-      owner: any;
       title: string;
       content: string;
       image?: File;
@@ -145,7 +161,7 @@
       setPostImage(null);
     };
 
-    useEffect(() => {
+    useEffect(() => { //לוקחת פוסטים מהשרת ומכניסה לPOSTS
       const fetchPosts = async () => {
         try {
           const response = await fetch("http://localhost:3001/api/posts");
@@ -190,8 +206,8 @@
             <div key={post._id} className="postCard">
 
 <div className="postUsernameWithImage">
-  <img src={post.owner.profileImage} alt="User" className="postUserProfileImage" />
-  <span className="postUsername">{post.owner.username}</span>
+  <img src={post.owner.profileImage || "/default-profile.png"} alt="User" className="postUserProfileImage" />
+  <span className="postUsername">{post.owner?.username|| "Unknown User"}</span>
 </div>
 
               
@@ -201,9 +217,14 @@
                 <img src={post.image} alt="post" className="postImage" />
               )}
               <div className="postFooter">
+              <button onClick={() => fetchComments(post._id)}>
+  View Comments
+</button>
+
                 <span onClick={() => onLike(post._id)}>❤️ {post.likesCount}</span>
                 <span>💬 {post.commentsList?.length || 0} Comments</span>
                 <button
+              
                   onClick={() => {
                     setCommentText("");
                     setShowCommentModal(post._id);
@@ -211,6 +232,7 @@
                 >
                   Add Comment
                 </button>
+                {viewCommentsPostId &&<CommentList comments={comments} setViewCommentsPostId={setViewCommentsPostId}/>}
               </div>
 
               {showCommentModal === post._id && (
@@ -259,6 +281,7 @@
                     שלח תגובה
                   </button>
                   <button onClick={() => setShowCommentModal(null)}>בטל</button>
+                  
                 </div>
               )}
             </div>
@@ -299,7 +322,6 @@
                 className="modalButton"
                 onClick={() =>
                   handleCreatePost({
-                    owner: "currentUser",
                     title: postTitle,
                     content: postContent,
                     image: postImage || undefined,
@@ -313,4 +335,26 @@
         )}
       </div>
     );
+  }
+
+
+  function CommentList({comments, setViewCommentsPostId}:{comments:{owner:{username:string}, comment:string }[], setViewCommentsPostId:(state:string|null)=>void}){
+
+    return(<div className="modalOverlay">
+      <div className="modalContent">
+        <button onClick={() => setViewCommentsPostId(null)} className="closeButton">
+          ✕
+        </button>
+        <h2 className="text-xl font-bold text-center">תגובות</h2>
+        {comments.length === 0 ? (
+          <p>אין תגובות עדיין</p>
+        ) : (
+          comments.map((c, index) => (
+            <div key={index} style={{ marginBottom: "10px" }}>
+              <strong>{c.owner.username}:</strong> {c.comment}
+            </div>
+          ))
+        )}
+      </div>
+    </div>)
   }

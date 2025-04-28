@@ -124,7 +124,7 @@ const [editPostImage, setEditPostImage] = useState<File | null>(null);
       }
   
       await fetch(`/api/posts/${postId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,

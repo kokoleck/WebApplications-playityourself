@@ -67,7 +67,7 @@ router.get("/", commentsController.getAll.bind(commentsController));
  *       404:
  *         description: Comment not found
  */
-router.get("/:id", commentsController.getById.bind(commentsController));
+router.get("/:postId", commentsController.getByPostId.bind(commentsController));
 
 /**
  * @swagger

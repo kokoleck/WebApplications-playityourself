@@ -176,6 +176,7 @@
     router.post("/", authMiddleware, postsController.create.bind(postsController));
 
     router.patch("/:id", authMiddleware, postsController.likePost.bind(postsController));
+    router.put("/:id", authMiddleware, postsController.update.bind(postsController));
 
     router.get("/user/:userId", asyncHandler(getPostsByUser));
 
