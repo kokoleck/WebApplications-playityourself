@@ -13,11 +13,25 @@ const options: swaggerJSDoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:3001",
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
       },
     ],
   },
-  apis: ["./src/routes/*.ts"], // פה תיעוד מופיע לפי קבצי הראוט
+  apis: ["./src/routes/*.ts"], // תיעוד מכל קבצי הראוט
 };
 
 const swaggerSpec = swaggerJSDoc(options);

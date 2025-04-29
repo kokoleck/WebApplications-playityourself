@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import LogoPlayItYourself from "./assets/LogoPlayItYourself.png"; 
+import LogoPlayItYourself from "../assets/LogoPlayItYourself.png"; 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
