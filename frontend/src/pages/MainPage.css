@@ -14,11 +14,13 @@ body {
 
 .pageHeader { /* כותרת הדף */
   width: 100%;
-  max-width: 800px;
+  max-width: 400px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  text-align: center;
+
 }
 
 .pageTitle { /* כותרת הדף */
@@ -105,7 +107,7 @@ body {
 .postCard {
   background: white;
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 16px;
@@ -138,9 +140,28 @@ body {
 /* פוטר הפוסט */
 .postFooter {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  justify-content: flex-start;
   align-items: center;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.modernBtn {
+  background-color: #1a73e8;
+  color: #facc15;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modernBtn:hover {
+  background-color: #155ab6;
+  transform: scale(1.03);
 }
 
 .postFooter button { /* כפתור לייק או מחק */

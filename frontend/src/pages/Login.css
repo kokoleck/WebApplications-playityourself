@@ -25,7 +25,7 @@
   }
   
   .logoImage {
-    width: 400px; /* תוכל לשנות את הגודל הזה לפי הצורך */
+    width: 280px; /* תוכל לשנות את הגודל הזה לפי הצורך */
     height: auto;
     object-fit: contain; /* שומר על יחס הגובה/רוחב */
     margin-bottom: 30px;

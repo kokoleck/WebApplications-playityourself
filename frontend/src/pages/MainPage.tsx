@@ -216,24 +216,38 @@ const fetchComments = async (postId: string) => {
               {post.image && (
                 <img src={post.image} alt="post" className="postImage" />
               )}
-              <div className="postFooter">
-              <button onClick={() => fetchComments(post._id)}>
-  View Comments
+             <div className="postFooter">
+  {/* כפתור לייק בצד שמאל */}
+  <button className="modernBtn" onClick={() => onLike(post._id)}>
+  ❤️ {post.likesCount}
 </button>
 
-                <span onClick={() => onLike(post._id)}>❤️ {post.likesCount}</span>
-                <span>💬 {post.commentsList?.length || 0} Comments</span>
-                <button
-              
-                  onClick={() => {
-                    setCommentText("");
-                    setShowCommentModal(post._id);
-                  }}
-                >
-                  Add Comment
-                </button>
-                {viewCommentsPostId &&<CommentList comments={comments} setViewCommentsPostId={setViewCommentsPostId}/>}
-              </div>
+
+  {/* כפתור הוספת תגובה */}
+  <button
+    className="modernBtn"
+    onClick={() => {
+      setCommentText("");
+      setShowCommentModal(post._id);
+    }}
+  >
+    Add Comment
+  </button>
+
+  {/* כפתור צפייה בתגובות */}
+  <button className="modernBtn" onClick={() => fetchComments(post._id)}>
+    View Comments
+  </button>
+
+  {/* רשימת תגובות (אם קיימת) */}
+  {viewCommentsPostId && (
+    <CommentList
+      comments={comments}
+      setViewCommentsPostId={setViewCommentsPostId}
+    />
+  )}
+</div>
+
 
               {showCommentModal === post._id && (
                 <div className="commentModal">
