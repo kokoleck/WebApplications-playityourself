@@ -4,6 +4,8 @@
   import { useNavigate } from "react-router-dom";
   import ProfileLogo from "./assets/ProfileLogo.png"; // תמונת הלוגו של המשתמש
   import LogoutLogo from "./assets/logoutLogo.png"; // תמונת כפתור התנתקות
+  import LogoPlayItYourself from "./assets/LogoPlayItYourself.png"; // תמונת הלוגו של האתר
+
 
   interface Post {
     _id: string;
@@ -187,21 +189,40 @@ const fetchComments = async (postId: string) => {
 
 
         <div className="floating-buttons">
+        <div className="leftButtons">
+          
+
+             {/* לוגו בראש סרגל הצד */}
+    <div className="sidebarLogo">
+      <img src={LogoPlayItYourself} alt="PlayItYourself Logo" className="logoImage" />
+    </div>
+
+    <div className="sideLine"></div>
+
     {/* כפתור פרופיל */}
-    <div className="leftButtons">
+    <div className="sidebarButton">
   <div className="userProfileLogo" onClick={handleProfileRedirect}>
     <img src={ProfileLogo} alt="User Profile" className="userLogoImage" />
   </div>
+  <span className="buttonLabel">Profile</span>
+</div>
+
+
 
 {/* כפתור התנתקות */}
-<button onClick={handleLogout} className="logoutButton">
+<div className="sidebarButton">
+  <button onClick={handleLogout} className="logoutButton">
     <img src={LogoutLogo} alt="Logout" className="logoutIcon" />
-    
   </button>
+  <span className="buttonLabel">Logout</span>
+</div>
+
 {/* כפתור הוספת פוסט */}
   <button onClick={() => setShowModal(true)} className="addPostButton">
             +
           </button>
+          <span className="buttonLabel"></span>
+
 </div>
 </div>
     
@@ -215,10 +236,11 @@ const fetchComments = async (postId: string) => {
   <img src={post.owner.profileImage || "/default-profile.png"} alt="User" className="postUserProfileImage" />
   <span className="postUsername">{post.owner?.username|| "Unknown User"}</span>
 </div>
+<div className="postTitle">{post.title}</div>
 
-              
-              <div className="postTitle">{post.title}</div>
-              <p>{post.content}</p>
+
+
+<p className="postContent">{post.content}</p>
               {post.image && (
                 <img src={post.image} alt="post" className="postImage" />
               )}

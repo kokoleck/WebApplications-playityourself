@@ -14,19 +14,19 @@ body {
 
 .pageHeader { /* כותרת הדף */
   width: 100%;
-  max-width: 400px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* מרכז אופקית */
   align-items: center;
-  margin-bottom: 30px;
-  text-align: center;
-
+  margin-bottom: 20px; /* מרווח לפני הפוסטים */
 }
 
 .pageTitle { /* כותרת הדף */
+  font-size: 2rem;
+  font-family: Arial, sans-serif;
   font-weight: bold;
-  color: #333;
+  text-align: center;
 }
+
 
 
 .floating-buttons {
@@ -37,13 +37,48 @@ body {
   flex-direction: column;
   gap: 10px;
   z-index: 1000;
+  
+}
+
+
+.sidebarLogo {
+  margin-bottom: 16px;
+}
+
+.logoImage { /* תמונה של הלוגו */
+  max-width: 150px;
+  height: auto;
+  display: block;
+}
+
+.leftButtons { /* כפתורים בצד שמאל */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.sideLine { /* קו בצד שמאל */
+  width: 1px;
+  height: 2000px;
+  background-color: white;
+  margin: 50px 0; /* מרווח בין הכפתורים לקו */
+  position: absolute;
+  left: 180px; /* המרחק מהקצה השמאלי של המסך */
+  top: 0; /* מתחיל מהחלק העליון של המסך */
+  z-index: 0; /* מתחת לכפתורים */
+
 }
 
 .userProfileLogo, /*לחצן לפרופיל המשתמש*/
 .logoutButton, /* לחצן התנתקות */
 .addPostButton { /* לחצן הוספת פוסט */
   background-color: #ffffff;
-  border: none;
+  border: none; 
+  font-size: 25px; 
   padding: 0px;
   border-radius: 50%;
   cursor: pointer;
@@ -52,7 +87,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 6px 0; /* מרווח בין הכפתורים */
 }
+
+
+.sidebarButton { 
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-direction: row-reverse; 
+  direction: rtl;
+}
+
+.buttonLabel {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: #000;
+}
+
+
 
 .logoutIcon, /* אייקון התנתקות */
 .userLogoImage { /* אייקון פרופיל המשתמש */
@@ -62,21 +116,6 @@ body {
   padding: 0;
   margin: 0;
 }
-
-
-
-
-
-.leftButtons { /* כפתור הוספת פוסט */
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px; /* מרווח גדול בין הכפתורים */
-}
-
 
 
 
@@ -95,12 +134,18 @@ body {
   font-weight: 600;
   color: #444;
   margin-bottom: 4px;
+  font-family: Arial, sans-serif;
+
 }
 
 .postTitle { /* כותרת הפוסט */
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 6px;
+  text-align: right; 
+  direction: rtl; 
+  font-family: Arial, sans-serif;
+
 }
 
 .postImage { /* תמונה של הפוסט */
@@ -114,11 +159,18 @@ body {
   border-radius: 10px;
 }
 
+
+.postContent { /* תוכן הפוסט */
+  font-family: Arial, sans-serif;
+  direction: rtl; /* טקסט מימין לשמאל */
+  text-align: right;
+}
+
 /* פוטר הפוסט */
 .postFooter {
   display: flex;
   gap: 10px;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   margin-top: 12px;
@@ -126,7 +178,7 @@ body {
 
 .modernBtn {
   background-color: #1a73e8;
-  color: #facc15;
+  color: #000000;
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
