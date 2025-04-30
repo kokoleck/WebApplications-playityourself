@@ -164,21 +164,24 @@ const fetchComments = async (postId: string) => {
       setPostImage(null);
     };
 
-    useEffect(() => { //לוקחת פוסטים מהשרת ומכניסה לPOSTS
+    const [page, setPage] = useState(1); // PAGING
+
+    useEffect(() => {
       const fetchPosts = async () => {
         try {
-          const response = await fetch("http://localhost:3001/api/posts");
+          const response = await fetch(`http://localhost:3001/api/posts?page=${page}&limit=5`);
           const data = await response.json();
           console.log("Fetched posts:", data);
-          setPosts(data.posts || []);
+          setPosts((prev) => [...prev, ...(data.posts || [])]);
         } catch (err) {
           console.error("Failed to fetch posts:", err);
-          setPosts([]);
         }
       };
-
+    
       fetchPosts();
-    }, []);
+    }, [page]);
+    
+    
 
     return (
       <div className="pageWrapper">
@@ -339,6 +342,13 @@ const fetchComments = async (postId: string) => {
               )}
             </div>
           ))}
+
+{posts.length > 0 && ( // אם יש פוסטים, הראה כפתור "טען עוד"
+  <button onClick={() => setPage((prev) => prev + 1)} className="loadMoreBtn">
+    טען עוד
+  </button>
+)}
+
 
         {showModal && (
           <div className="modalOverlay">
