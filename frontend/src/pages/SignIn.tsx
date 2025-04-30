@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import LogoPlayItYourself from "../assets/LogoPlayItYourself.png"; 
+import LogoPlayItYourself from "./assets/LogoPlayItYourself.png"; 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -37,6 +37,8 @@ export default function SignIn() {
       alert("נא להזין כתובת אימייל תקינה");
       return;}
     try {
+      console.log("Trying to login with:", { email: loginEmail, password: loginPassword });
+
       const res = await fetch("http://localhost:3000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

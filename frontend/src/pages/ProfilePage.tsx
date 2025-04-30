@@ -27,9 +27,15 @@ const [editPostImage, setEditPostImage] = useState<File | null>(null);
     const fetchUserProfile = async () => {
       try {
         const response = await fetch(`/api/users/${id}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText);
+        }
+        
         const data = await response.json();
         setUser(data);
-        setEditUsername(data.username || ""); // בעת עריכה נתחיל עם השם הנוכחי
+        setEditUsername(data.username || "");
+         // בעת עריכה נתחיל עם השם הנוכחי
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
       }

@@ -2,8 +2,8 @@
   import "./MainPage.css";
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
-  import ProfileLogo from "../assets/ProfileLogo.png"; // תמונת הלוגו של המשתמש
-  import LogoutLogo from "../assets/LogoutLogo.png"; // תמונת כפתור התנתקות
+  import ProfileLogo from "./assets/ProfileLogo.png"; // תמונת הלוגו של המשתמש
+  import LogoutLogo from "./assets/LogoutLogo.png"; // תמונת כפתור התנתקות
 
   interface Post {
     _id: string;

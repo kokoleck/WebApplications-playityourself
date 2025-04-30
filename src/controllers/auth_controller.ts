@@ -89,13 +89,13 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const user = await userModel.findOne({ email });
-    if (!user) return res.status(400).send("Invalid credentials");
+    if (!user) return res.status(400).json({message: "Invalid credentials"});
 
     const isMatch = await bcrypt.compare(password, user.password!);
-    if (!isMatch) return res.status(400).send("Invalid credentials");
+    if (!isMatch) return res.status(400).json({message: "Invalid credentials"});
 
     const tokens = generateToken(user._id.toString());
-    if (!tokens) return res.status(500).send("Token creation failed");
+    if (!tokens) return res.status(500).json({message: "Token creation failed"});
 
     const u = user as IUserDoc;
     u.refreshToken = [...(u.refreshToken || []), tokens.refreshToken];
@@ -107,7 +107,7 @@ export const login = async (req: Request, res: Response) => {
       refreshToken: tokens.refreshToken,
     });
   } catch {
-    res.status(400).send("Login failed");
+    res.status(400).json("Login failed");
   }
 };
 
