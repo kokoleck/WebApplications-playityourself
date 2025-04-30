@@ -28,51 +28,43 @@ body {
   color: #333;
 }
 
-/* כפתור פרופיל */
-.userProfileLogo {
-  width: 45px;
-  height: 45px;
-  background-color: #facc15;
+
+.floating-buttons {
+  position: fixed;
+  top: 20px;
+  left: 20px; /* שימי לב: אם את רוצה בצד ימין - החליפי ל־right: 20px */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.userProfileLogo, /*לחצן לפרופיל המשתמש*/
+.logoutButton, /* לחצן התנתקות */
+.addPostButton { /* לחצן הוספת פוסט */
+  background-color: #fdd835;
+  border: none;
+  padding: 0px;
   border-radius: 50%;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  border: none;
-  transition: background 0.3s ease;
 }
 
-.userProfileLogo:hover {
-  background-color: #eab308;
+.logoutIcon, /* אייקון התנתקות */
+.userLogoImage { /* אייקון פרופיל המשתמש */
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  padding: 0;
+  margin: 0;
 }
 
-.userLogoImage {
-  width: 60%;
-  height: 60%;
-  border-radius: 50%;
-}
 
-/* כפתור התנתקות */
-.logoutButton {
-  width: 45px;
-  height: 45px;
-  background-color: #facc15;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  transition: background 0.3s ease;
-}
-.logoutButton:hover {
-  background-color: #eab308;
-}
 
-.logoutIcon {
-  width: 60%;
-  height: 60%;
-}
 
 
 .leftButtons { /* כפתור הוספת פוסט */
@@ -86,22 +78,7 @@ body {
 }
 
 
-/* כפתור הוספת פוסט */
-.addPostButton {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  font-size: 1.8rem;
-  background-color: #facc15;
-  color: #333;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
 
-.addPostButton:hover {
-  background-color: #eab308;
-}
 
 /* פוסט */
 .postCard {

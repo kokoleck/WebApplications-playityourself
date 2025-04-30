@@ -3,7 +3,7 @@
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
   import ProfileLogo from "./assets/ProfileLogo.png"; // תמונת הלוגו של המשתמש
-  import LogoutLogo from "./assets/LogoutLogo.png"; // תמונת כפתור התנתקות
+  import LogoutLogo from "./assets/logoutLogo.png"; // תמונת כפתור התנתקות
 
   interface Post {
     _id: string;
@@ -181,11 +181,11 @@ const fetchComments = async (postId: string) => {
       <div className="pageWrapper">
         <div className="pageHeader">
           <h1 className="pageTitle">Discover New Fun</h1>
-          <button onClick={() => setShowModal(true)} className="addPostButton">
-            +
-          </button>
         </div>
 
+
+
+        <div className="floating-buttons">
     {/* כפתור פרופיל */}
     <div className="leftButtons">
   <div className="userProfileLogo" onClick={handleProfileRedirect}>
@@ -197,6 +197,11 @@ const fetchComments = async (postId: string) => {
     <img src={LogoutLogo} alt="Logout" className="logoutIcon" />
     
   </button>
+{/* כפתור הוספת פוסט */}
+  <button onClick={() => setShowModal(true)} className="addPostButton">
+            +
+          </button>
+</div>
 </div>
     
 
