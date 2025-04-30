@@ -56,12 +56,23 @@ class PostsController extends BaseController<IPost> {
 
       const totalPages = Math.ceil(total / limitNum);
 
+      const postsWithCommentsCount = await Promise.all( /* הוספת ספירת תגובה לכל פוסט */
+        posts.map(async (post) => {
+          const count = await mongoose.model("comments").countDocuments({ postId: post._id });
+          return {
+            ...post.toObject(),
+            commentsCount: count,
+          };
+        })
+      );
+      
       res.status(200).json({
-        posts: posts,
+        posts: postsWithCommentsCount,
         currentPage: pageNum,
         totalPages,
         totalCount: total,
       });
+      
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch posts", error });
     }

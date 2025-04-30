@@ -42,7 +42,7 @@ body {
 .userProfileLogo, /*לחצן לפרופיל המשתמש*/
 .logoutButton, /* לחצן התנתקות */
 .addPostButton { /* לחצן הוספת פוסט */
-  background-color: #fdd835;
+  background-color: #ffffff;
   border: none;
   padding: 0px;
   border-radius: 50%;
@@ -56,8 +56,8 @@ body {
 
 .logoutIcon, /* אייקון התנתקות */
 .userLogoImage { /* אייקון פרופיל המשתמש */
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   padding: 0;
   margin: 0;

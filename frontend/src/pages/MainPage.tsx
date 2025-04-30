@@ -13,7 +13,8 @@
     image?: string;
     likesCount: number;
     likedBy: string[];
-    commentsList: Array<{ comment: string; owner:{username: string} }>;
+    commentsList?: Array<{ comment: string; username: string }>; // אם נשאר
+    commentsCount?: number;
     owner: {
       username: string;
       profileImage: string;
@@ -241,8 +242,8 @@ const fetchComments = async (postId: string) => {
 
   {/* כפתור צפייה בתגובות */}
   <button className="modernBtn" onClick={() => fetchComments(post._id)}>
-    View Comments
-  </button>
+  View Comments ({post.commentsCount ?? 0})
+    </button>
 
   {/* רשימת תגובות (אם קיימת) */}
   {viewCommentsPostId && (
@@ -287,9 +288,20 @@ const fetchComments = async (postId: string) => {
                             },
                           }
                         );
+                        
+                        // עדכון ספירת תגובות לפוסט
+                        setPosts((prevPosts) =>
+                          prevPosts.map((p) =>
+                            p._id === post._id
+                              ? { ...p, commentsCount: (p.commentsCount ?? 0) + 1 }
+                              : p
+                          )
+                        );
+                        
                         console.log("תגובה נשלחה:", commentText);
                         setCommentText("");
                         setShowCommentModal(null);
+                        
                       } catch (err: any) {
                         console.error("Error posting comment:", err.response?.data || err);
                         alert("שליחת התגובה נכשלה");
