@@ -247,11 +247,16 @@ const fetchComments = async (postId: string) => {
               {post.image && (
                 <img src={post.image} alt="post" className="postImage" />
               )}
-             <div className="postFooter">
-  {/* כפתור לייק בצד שמאל */}
-  <button className="modernBtn" onClick={() => onLike(post._id)}>
-  ❤️ {post.likesCount}
-</button>
+           <div className="postFooter">
+{/* כפתור לייק בצד שמאל */}
+{(() => {
+  const currentUserId = localStorage.getItem("userId");
+  return (
+    <button className="modernBtn" onClick={() => onLike(post._id)}>
+      {post.likedBy.includes(currentUserId || "") ? "❤️" : "🤍"} {post.likesCount}
+    </button>
+  );
+})()}
 
 
   {/* כפתור הוספת תגובה */}
