@@ -25,14 +25,22 @@
   }
   
   .logoImage {
-    width: 280px; /* תוכל לשנות את הגודל הזה לפי הצורך */
+    width: 250px; 
+    max-width: 100%;
     height: auto;
-    object-fit: contain; /* שומר על יחס הגובה/רוחב */
+    object-fit: contain;
     margin-bottom: 30px;
   }
   
   
-
+  
+  .logoContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
   
   .diceIcon {
     font-size: 2rem;

@@ -63,11 +63,11 @@ body {
 
 .sideLine { /* קו בצד שמאל */
   width: 1px;
-  height: 2000px;
+  height: 100vh;
   background-color: white;
-  margin: 50px 0; /* מרווח בין הכפתורים לקו */
+  margin: 0;
   position: absolute;
-  left: 180px; /* המרחק מהקצה השמאלי של המסך */
+  left: 270px; /* המרחק מהקצה השמאלי של המסך */
   top: 0; /* מתחיל מהחלק העליון של המסך */
   z-index: 0; /* מתחת לכפתורים */
 

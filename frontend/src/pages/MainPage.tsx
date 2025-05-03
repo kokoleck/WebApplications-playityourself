@@ -153,7 +153,16 @@ const fetchComments = async (postId: string) => {
         console.log("Post creation response:", response.data);
 
         const newPost: Post = response.data as Post;
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        const username = localStorage.getItem("username") || "Unknown User";
+const profileImage = localStorage.getItem("profileImage") || "/default-profile.png";
+
+newPost.owner = {
+  _id: localStorage.getItem("userId") || "",
+  username,
+  profileImage,
+};
+
+        setPosts((prevPosts) => [newPost, ...prevPosts]); 
       } catch (error: any) {
         console.error("Error creating post:", error.response?.data || error);
         alert(`Failed to create post: ${error.response?.data?.message || "Unknown error"}`);
@@ -172,7 +181,7 @@ const fetchComments = async (postId: string) => {
           const response = await fetch(`http://localhost:3001/api/posts?page=${page}&limit=5`);
           const data = await response.json();
           console.log("Fetched posts:", data);
-          setPosts((prev) => [...prev, ...(data.posts || [])]);
+          setPosts(data.posts || []);
         } catch (err) {
           console.error("Failed to fetch posts:", err);
         }

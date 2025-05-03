@@ -88,7 +88,13 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userModel.findOne({ email });
+console.log("📥 Email:", email);
+console.log("📥 Password from user:", password);
+
+const user = await userModel.findOne({ email });
+if (!user) return res.status(400).json({message: "Invalid credentials"});
+
+console.log("🔐 Password in DB:", user.password);
     if (!user) return res.status(400).json({message: "Invalid credentials"});
 
     const isMatch = await bcrypt.compare(password, user.password!);
@@ -102,7 +108,7 @@ export const login = async (req: Request, res: Response) => {
     await u.save();
 
     res.status(200).send({
-      user: { _id: user._id, email: user.email, username: user.username },
+      user: { _id: user._id, email: user.email, username: user.username ,profileImage: user.profileImage || "/default-profile.png"},
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     });

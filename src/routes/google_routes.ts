@@ -28,7 +28,7 @@ router.get(
 
     try {
       // בודקים אם המשתמש כבר קיים
-      let existingUser = await userModel.findOne({ googleId: user.id });
+      let existingUser = await userModel.findOne({ email: user.email  });
 
       if (!existingUser) {
         // אם לא קיים – יוצרים משתמש חדש
@@ -38,6 +38,10 @@ router.get(
           profileImage: user.photo,
           googleId: user.id,
         });
+      } else if (!existingUser.googleId) {
+        // 🔗 אם המשתמש קיים אבל עדיין בלי googleId – מעדכנים אותו
+        existingUser.googleId = user.id;
+        await existingUser.save();
       }
 
       // יוצרים טוקן
@@ -48,7 +52,11 @@ router.get(
       );
 
       // מחזירים את הטוקן לפרונט דרך redirect
-      res.redirect(`http://localhost:3000/signin?token=${accessToken}`);
+      res.redirect(
+        `http://localhost:3000/signin?token=${accessToken}&userId=${existingUser._id}&username=${encodeURIComponent(
+          existingUser.username
+        )}&profileImage=${encodeURIComponent(existingUser.profileImage || "/default-profile.png")}`
+      );
     } catch (err) {
       console.error("Google login error:", err);
       res.redirect("/signin");

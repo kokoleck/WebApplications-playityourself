@@ -106,6 +106,7 @@ console.log("user id", res.locals.userIdS)
       image,
       userId: res.locals.userId
     });
+    
 
     res.status(201).json( post );
   } catch (error) {

@@ -18,12 +18,23 @@ export default function SignIn() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    if (token) {
+    const userId = params.get("userId");
+    const username = params.get("username");
+    const profileImage = params.get("profileImage");
+  
+    if (token && userId) {
+      localStorage.clear(); // מחיקת נתוני משתמש קודם
       localStorage.setItem("authToken", token);
-      // מעבר אוטומטי לדף הבית בלי רענון
+      localStorage.setItem("userId", userId);
+      if (username) localStorage.setItem("username", username);
+      if (profileImage) localStorage.setItem("profileImage", profileImage);
+  
       navigate("/", { replace: true });
+      window.location.reload(); 
+
     }
-  }, [navigate]); // הוספנו את ה-navigate כתלות כדי לוודא שהמעבר יקרה רק אחרי ש-navigate הושלם
+  }, [navigate]);
+  
   
 
   const isValidEmail = (email: string) => {
@@ -51,6 +62,10 @@ export default function SignIn() {
         toast.success("התחברת בהצלחה!"); // השתמש ב-toast.success
         localStorage.setItem("authToken", data.accessToken);
         localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("profileImage", data.user.profileImage || "/default-profile.png");
+
+
 
         setTimeout(() => { 
           navigate("/"); // מעבר אוטומטי אחרי 2 שניות
