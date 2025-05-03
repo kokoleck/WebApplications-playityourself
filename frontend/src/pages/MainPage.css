@@ -226,6 +226,7 @@ body {
 
 
 .modalContent { /* תוכן המודאל */
+  position: relative;
   background-color: #ffffff;
   padding: 25px;
   border-radius: 18px;
