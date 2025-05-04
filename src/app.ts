@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" });
 
 import express, { Express } from "express";
 import cors from "cors";
@@ -47,10 +47,12 @@ app.get("/", (req, res) => {
 // Mongo connection + return app
 const initApp = () => {
   return new Promise<Express>((resolve, reject) => {
-    if (!process.env.DB_CONNECT) return reject("Missing DB_CONNECT in .env");
-
+    const mongoUri = process.env.MONGO_URI || process.env.DB_CONNECT;
+    if (!mongoUri) return reject("Missing MONGO_URI or DB_CONNECT in .env");
+    
     mongoose
-      .connect(process.env.DB_CONNECT)
+      .connect(mongoUri)
+    
       .then(() => {
         console.log("Connected to MongoDB");
         resolve(app);
