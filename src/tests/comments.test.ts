@@ -24,23 +24,24 @@ describe("Comments Tests", () => {
     await commentsModel.deleteMany();
     await postsModel.deleteMany();
 
-    // יצירת משתמש
-    const resRegister = await request(app).post("/api/auth/register").send({
+    // ✅ תיקון: רישום דרך /api/users/register ולא /api/auth/register
+    const resRegister = await request(app).post("/api/users/register").send({
       username: "commentUser",
       email: "comment@user.com",
       password: "test1234",
     });
+
     console.log("Register Response Body:", resRegister.body);
     console.log("Register Status Code:", resRegister.statusCode);
-    
+
     if (!resRegister.body.accessToken || !resRegister.body.user?._id) {
       throw new Error("Registration failed – accessToken or userId missing");
     }
 
     accessToken = resRegister.body.accessToken;
-    userId = resRegister.body.user?._id;
+    userId = resRegister.body.user._id;
 
-    // יצירת פוסט
+    // ✅ יצירת פוסט דרך המודל (בלי בקשת API)
     const newPost = await postsModel.create({
       title: "Test Post",
       content: "This is a test post",
