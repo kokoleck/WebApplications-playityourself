@@ -160,7 +160,7 @@ console.log("user id", res.locals.userIdS)
       const postId = req.params.id;
       const userId = req.user;
 
-      const post = await postModel.findById(postId);
+        const post = await postModel.findById(postId);
       if (!post) {
         res.status(404).json({ message: "Post not found" });
         return;
@@ -171,14 +171,14 @@ console.log("user id", res.locals.userIdS)
         return;
       }
 
-      const { title, content } = req.body;
-      //const image = req.file ? `/uploads/${req.file.filename}` : post.image;//
-      const image = req.body.image || "";
+    const { title, content, image } = req.body; //שמירת תמונה קיימת אם לא הועלתה חדשה
+        const updatedImage = image !== undefined && image !== "" ? image : post.image;
+
 
 
       const updatedPost = await postModel.findByIdAndUpdate(
         postId,
-        { title, content, image },
+        { title, content, image: updatedImage, },
         { new: true }
       );
 

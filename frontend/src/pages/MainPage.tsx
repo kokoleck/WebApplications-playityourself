@@ -245,7 +245,7 @@ newPost.owner = {
             <div key={post._id} className="postCard">
 
 <div className="postUsernameWithImage">
-  <img src={post.owner.profileImage || "/default-profile.png"} alt="User" className="postUserProfileImage" />
+<img src={post.owner?.profileImage || "/default-profile.png"} alt="User" className="postUserProfileImage" />
   <span className="postUsername">{post.owner?.username|| "Unknown User"}</span>
 </div>
 <div className="postTitle">{post.title}</div>
