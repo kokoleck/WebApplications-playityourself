@@ -35,6 +35,7 @@ class CommentsController extends BaseController<iComment> {
       const populated = await newComment.save();
 
       res.status(201).json({
+          _id: populated._id,
         comment: populated.comment,
         username: populated.owner
       });

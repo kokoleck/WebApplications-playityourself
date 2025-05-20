@@ -24,12 +24,13 @@ describe("Comments Tests", () => {
     await commentsModel.deleteMany();
     await postsModel.deleteMany();
 
-    // ✅ תיקון: רישום דרך /api/users/register ולא /api/auth/register
-    const resRegister = await request(app).post("/api/users/register").send({
-      username: "commentUser",
-      email: "comment@user.com",
-      password: "test1234",
-    });
+const uniqueEmail = `comment+${Date.now()}@user.com`;
+const resRegister = await request(app).post("/api/users/register").send({
+  username: "commentUser",
+  email: uniqueEmail,
+  password: "test1234",
+});
+
 
     console.log("Register Response Body:", resRegister.body);
     console.log("Register Status Code:", resRegister.statusCode);
@@ -41,7 +42,6 @@ describe("Comments Tests", () => {
     accessToken = resRegister.body.accessToken;
     userId = resRegister.body.user._id;
 
-    // ✅ יצירת פוסט דרך המודל (בלי בקשת API)
     const newPost = await postsModel.create({
       title: "Test Post",
       content: "This is a test post",
@@ -66,7 +66,7 @@ describe("Comments Tests", () => {
 
     expect(response.statusCode).toBe(201);
     expect(response.body.comment).toBe(commentPayload.comment);
-    commentId = response.body._id;
+    commentId = response.body._id || ""; // שמירה למחיקה
   });
 
   test("Fail Create Comment without token", async () => {
@@ -77,6 +77,15 @@ describe("Comments Tests", () => {
     expect(response.statusCode).toBe(401);
   });
 
+  test("Fail Create Comment with missing fields", async () => {
+    const response = await request(app)
+      .post("/api/comments")
+      .set("Authorization", "Bearer " + accessToken)
+      .send({ postId }); // חסר comment
+
+    expect(response.statusCode).toBe(400);
+  });
+
   test("Get Comments By Post ID", async () => {
     const response = await request(app)
       .get("/api/comments/" + postId);
@@ -84,5 +93,21 @@ describe("Comments Tests", () => {
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body[0].comment).toBe(commentPayload.comment);
+  });
+
+  test("Get Comments for nonexistent post ID", async () => {
+    const fakePostId = new mongoose.Types.ObjectId();
+    const response = await request(app)
+      .get("/api/comments/" + fakePostId);
+
+    expect(response.statusCode).toBe(404);
+  });
+
+  test("Delete Comment", async () => {
+    const response = await request(app)
+      .delete("/api/comments/" + commentId)
+      .set("Authorization", "Bearer " + accessToken);
+
+    expect(response.statusCode).toBe(200);
   });
 });
