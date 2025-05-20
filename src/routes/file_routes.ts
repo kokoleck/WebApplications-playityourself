@@ -143,7 +143,7 @@ router.put('/users/image/:userId', authMiddleware, upload.single("profileImage")
 
         const updatedUser = await userModel.findByIdAndUpdate(
             userId,
-            { image: imageUrl },
+            { profileImage: imageUrl },
             { new: true }
         );
 
